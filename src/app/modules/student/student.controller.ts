@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { studentServices } from "./student.service";
 // import Joi from 'joi'
 // import StudentJoiValidationSchema from "./student.validation";
-import { z } from "zod";
 import StudentValidationSchema from "./student.validation";
 
 const createStudent =  async(req : Request, res : Response) =>{
@@ -38,10 +37,10 @@ const createStudent =  async(req : Request, res : Response) =>{
             data: result
         })
 
-    }catch(error){
+    }catch(error: any){
         res.status(500).json({
             success: false,
-            message: "something went wrong",
+            message: error.message || "something went wrong",
             error: error
         })
     }
@@ -56,8 +55,12 @@ const getAllStudents = async(req : Request, res : Response) =>{
             message: "students are retrieved successfully",
             data: result
         })
-    }catch(error){
-        console.log(error);
+    }catch(error: any){
+        res.status(500).json({
+            success: false,
+            message: error.message || "something went wrong",
+            error: error
+        })
     }
 }
 
@@ -72,13 +75,39 @@ const getSingleStudent = async(req: Request, res: Response) =>{
             data: result
         })
         
-    } catch (error) {
-        console.log(error);
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || "something went wrong",
+            error: error
+        })
+    }
+}
+
+
+//delete single
+const deleteStudent = async(req: Request, res: Response) =>{
+    try {
+        const id = req.params.studentId
+        const result = await studentServices.deleteStudentFromDb(id)
+        res.status(200).json({
+            success: true,
+            message: "student is deleted successfully",
+            data: result
+        })
+        
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || "something went wrong",
+            error: error
+        })
     }
 }
 
 export const studentControllers = {
     createStudent,
     getAllStudents,
-    getSingleStudent
+    getSingleStudent,
+    deleteStudent
 }
